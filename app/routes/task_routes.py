@@ -2,6 +2,8 @@ from flask import Blueprint, abort, make_response, request, Response
 from app.models.task import Task
 from ..db import db
 from .route_utilities import validate_model
+from datetime import datetime
+from datetime import timezone
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -60,7 +62,7 @@ def get_one_task(task_id):
     task = validate_model(Task, task_id)
     return {"task": task.to_dict()}
 
-#Wave 4
+#Wave 1
 @bp.put("/<task_id>")
 def update_one_task(task_id):
     task = validate_model(Task, task_id)
@@ -73,7 +75,7 @@ def update_one_task(task_id):
     # needs fixing
     return Response(status=204, mimetype="application/json")
 
-#Wave 4
+#Wave 1
 @bp.delete("/<task_id>")
 def delete_one_task(task_id):
     task = validate_model(Task, task_id)
@@ -83,3 +85,39 @@ def delete_one_task(task_id):
 
     return Response(status=204, mimetype="application/json")
     
+# Wave 3
+@bp.patch("/<task_id>/mark_complete")
+def completed_task(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = datetime.now(timezone.utc)
+
+    db.session.commit()
+    return Response(status=204, mimetype="application/json")
+
+# Wave 3
+@bp.patch("/<task_id>/mark_incomplete")
+def incomplete_task(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = None
+
+    db.session.commit()
+    return Response(status=204, mimetype="application/json")
+
+# Wave 3
+@bp.patch("/<task_id>/mark_complete")
+def completed_on_complete_task(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = datetime.now(timezone.utc)
+
+    db.session.commit()
+    return Response(status=204, mimetype="application/json")
+
+# Wave 3
+@bp.patch("/<task_id>/mark_incomplete")
+def incompleted_on_incomplete_task(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = None
+
+    db.session.commit()
+    return Response(status=204, mimetype="application/json")
+
