@@ -30,6 +30,7 @@ def create_task():
 @bp.get("")
 def get_all_tasks():
     query = db.select(Task)
+
     description_param = request.args.get("description")
     if description_param:
         query = query.where(Task.description.ilike(f"%{description_param}%"))
@@ -37,7 +38,13 @@ def get_all_tasks():
     completed_at_param = request.args.get("completed_at")
     if completed_at_param:
         query = query.where(Task.completed_at.like=={completed_at_param})
-        
+
+    sort_param = request.args.get("sort")
+    if sort_param == "asc":
+        query = query.order_by(Task.title.asc())
+    elif sort_param == "desc":
+        query = query.order_by(Task.title.desc())
+
     query = query.order_by(Task.id)
     tasks = db.session.scalars(query)
 
