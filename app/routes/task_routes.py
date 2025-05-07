@@ -4,6 +4,8 @@ from ..db import db
 from .route_utilities import validate_model
 from datetime import datetime
 from datetime import timezone
+import requests
+import os
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -121,3 +123,32 @@ def incompleted_on_incomplete_task(task_id):
     db.session.commit()
     return Response(status=204, mimetype="application/json")
 
+# Wave 4
+# @bp.patch("/<task_id>/mark_complete")
+def completed_task_notification_by_API(task_id):
+    task = validate_model(Task, task_id)
+    task.title = "My Beautiful Task"
+    task.completed_at = datetime.now(timezone.utc)
+    db.session.commit()
+
+    # Send Slack message
+    slack_url = "https://slack.com/api/chat.postMessage"
+    slack_token = os.environ.get("SLACK_BOT_TOKEN")
+    slack_channel = "task-notifications"  # Can also be channel ID like "C01ABCXYZ"
+
+    message = {
+        "channel": slack_channel,
+        "text": f"Someone just completed the task {task.title}"
+    }
+
+    headers = {
+        "Authorization": f"Bearer {slack_token}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(slack_url, json=message, headers=headers)
+
+    if not response.ok:
+        print("Slack message failed:", response.json())
+
+    return Response(status=204)
