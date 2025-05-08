@@ -1,5 +1,6 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.task import Task
+from app.models.goal import Goal
 from ..db import db
 from .route_utilities import validate_model, create_model
 from datetime import datetime
@@ -8,6 +9,7 @@ import requests
 import os
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
 
 #Wave 1
 @bp.post("")
@@ -139,3 +141,21 @@ def completed_task_notification_by_API(task_id):
         print("Slack message failed:", response.json())
 
     return Response(status=204)
+
+# @bp_child.post("")
+# def tasks_to_goal(goal_id,list_id):
+#     goal = validate_model(Goal, goal_id)
+    
+#     task_ids = []
+#     for task_id in list_id:
+#         task = validate_model(Task, task_id)
+#         task.goal_id = goal.goal_id
+#         task_ids.append(task.task_id)
+
+#     db.session.commit()
+
+#     return {
+#         "id": goal.goal_id,
+#         "task_ids": task_ids
+#     }, 200
+

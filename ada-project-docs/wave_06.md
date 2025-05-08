@@ -1,4 +1,4 @@
-# Wave 6: Establishing a One-to-Many Relationship
+  # Wave 6: Establishing a One-to-Many Relationship
 
 ## Goal
 
