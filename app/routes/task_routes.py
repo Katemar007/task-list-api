@@ -1,7 +1,7 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.task import Task
 from ..db import db
-from .route_utilities import validate_model
+from .route_utilities import validate_model, create_model
 from datetime import datetime
 from datetime import timezone
 import requests
@@ -13,22 +13,9 @@ bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 @bp.post("")
 def create_task():
     request_body = request.get_json()
-    
-    try:
-        new_task = Task.from_dict(request_body)
+    new_task, status_code = create_model(Task, request_body)
 
-    except KeyError as error:
-        if "description" not in request_body  or "title" not in request_body:
-            response = {"details": "Invalid data"}
-        else:
-            response = {"details": f"Invalid request: missing {error.args[0]}"}
-
-        abort(make_response(response, 400))
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    return {"task": new_task.to_dict()}, 201
+    return {"task": new_task}, status_code
 
 #Wave 3 and Wave 5
 @bp.get("")
