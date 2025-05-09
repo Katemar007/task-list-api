@@ -65,6 +65,7 @@ def delete_one_goal(goal_id):
 
     return Response(status=204, mimetype="application/json")
 
+
 @bp.post("/<goal_id>/tasks")
 def tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -83,6 +84,7 @@ def tasks_to_goal(goal_id):
         "task_ids": task_list
     }
 
+
 @bp.get("/<goal_id>/tasks")
 def tasks_for_specific_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -91,9 +93,3 @@ def tasks_for_specific_goal(goal_id):
     goal_dict["tasks"] = [task.to_dict() for task in tasks]
     
     return goal_dict, 200
-
-    # goal = cls(title=goal_data["title"])
-
-    # # Optionally set tasks if they exist
-    # if "tasks" in goal_data:
-    #     goal.tasks = [Task.query.get(task_id) for task_id in goal_data["tasks"]]

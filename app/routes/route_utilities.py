@@ -17,6 +17,7 @@ def validate_model(cls, model_id):
 
     return model
 
+
 def create_model(cls, model_data):
     try:
         new_model = cls.from_dict(model_data)
@@ -30,6 +31,7 @@ def create_model(cls, model_data):
 
     return new_model.to_dict(), 201
 
+# Work in progress
 def task_to_dict(Task, data):
     {
             "id": data.id,

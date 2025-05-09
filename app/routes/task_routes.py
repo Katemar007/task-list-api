@@ -14,7 +14,6 @@ load_dotenv()
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 
-#Wave 1
 @bp.post("")
 def create_task():
     request_body = request.get_json()
@@ -22,7 +21,7 @@ def create_task():
 
     return {"task": new_task}, status_code
 
-#Wave 3 and Wave 5
+
 @bp.get("")
 def get_all_tasks():
     query = db.select(Task)
@@ -50,13 +49,13 @@ def get_all_tasks():
     
     return tasks_response
 
-#Wave 1
+
 @bp.get("/<task_id>")
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
     return {"task": task.to_dict()}
 
-#Wave 1
+
 @bp.put("/<task_id>")
 def update_one_task(task_id):
     task = validate_model(Task, task_id)
@@ -69,7 +68,7 @@ def update_one_task(task_id):
     # needs fixing
     return Response(status=204, mimetype="application/json")
 
-#Wave 1
+
 @bp.delete("/<task_id>")
 def delete_one_task(task_id):
     task = validate_model(Task, task_id)
@@ -80,33 +79,35 @@ def delete_one_task(task_id):
     return Response(status=204, mimetype="application/json")
     
 # Wave 3
-@bp.patch("/<task_id>/mark_complete")
-def completed_task(task_id):
-    task = validate_model(Task, task_id)
-    task.completed_at = datetime.now(timezone.utc)
-    task_title = task.title
-    send_request_to_slackbot(task_title)
+# @bp.patch("/<task_id>/mark_complete")
+# def completed_task(task_id):
+#     task = validate_model(Task, task_id)
+#     task.completed_at = datetime.now(timezone.utc)
+#     print(f'********* mark_complete {task_id} {task.completed_at}')
+#     task_title = task.title
+#     send_request_to_slackbot(task_title)
 
-    db.session.commit()
+#     db.session.commit()
 
-    return Response(status=204, mimetype="application/json")
+#     return Response(status=204, mimetype="application/json")
 
-def send_request_to_slackbot(data):
-    bot_path = os.environ.get("SLACK_BOT_PATH")
-    bot_token = os.environ.get("SLACK_BOT_TOKEN")
-    channel_id = os.environ.get("SLACK_CHANNEL_ID")
-    message = "Restoration attempt #3 {data}"
+# def send_request_to_slackbot(data):
+#     print(f'********* request_to_slackbot')
+#     bot_path = os.environ.get("SLACK_BOT_PATH")
+#     bot_token = os.environ.get("SLACK_BOT_TOKEN")
+#     channel_id = os.environ.get("SLACK_CHANNEL_ID")
+#     message = "Restoration attempt #3 {data}"
 
-    token = f"Bearer {bot_token}"
-    headers = {
-        "Content-type": "application/json", 
-        "Authorization": token}
-    request_body = {
-        "channel": channel_id,
-        "text": message
-        }
+#     token = f"Bearer {bot_token}"
+#     headers = {
+#         "Content-type": "application/json", 
+#         "Authorization": token}
+#     request_body = {
+#         "channel": channel_id,
+#         "text": message
+#         }
 
-# Wave 3
+
 @bp.patch("/<task_id>/mark_incomplete")
 def incomplete_task(task_id):
     task = validate_model(Task, task_id)
@@ -115,16 +116,16 @@ def incomplete_task(task_id):
     db.session.commit()
     return Response(status=204, mimetype="application/json")
 
-# Wave 3
-@bp.patch("/<task_id>/mark_complete")
-def completed_on_complete_task(task_id):
-    task = validate_model(Task, task_id)
-    task.completed_at = datetime.now(timezone.utc)
 
-    db.session.commit()
-    return Response(status=204, mimetype="application/json")
+# @bp.patch("/<task_id>/mark_complete")
+# def completed_on_complete_task(task_id):
+#     task = validate_model(Task, task_id)
+#     task.completed_at = datetime.now(timezone.utc)
 
-# Wave 3
+#     db.session.commit()
+#     return Response(status=204, mimetype="application/json")
+
+
 @bp.patch("/<task_id>/mark_incomplete")
 def incompleted_on_incomplete_task(task_id):
     task = validate_model(Task, task_id)
@@ -133,8 +134,8 @@ def incompleted_on_incomplete_task(task_id):
     db.session.commit()
     return Response(status=204, mimetype="application/json")
 
-# Wave 4
-# @bp.patch("/<task_id>/mark_complete")
+
+@bp.patch("/<task_id>/mark_complete")
 def completed_task_notification_by_API(task_id):
     task = validate_model(Task, task_id)
     task.title = "My Beautiful Task"
@@ -144,7 +145,7 @@ def completed_task_notification_by_API(task_id):
     # Send Slack message
     slack_url = "https://slack.com/api/chat.postMessage"
     slack_token = os.environ.get("SLACK_BOT_TOKEN")
-    slack_channel = "task-notifications"  # Can also be channel ID like "C01ABCXYZ"
+    slack_channel = os.environ.get("SLACK_CHANNEL_ID")  # Can also be channel ID like "C01ABCXYZ"
 
     message = {
         "channel": slack_channel,
@@ -162,21 +163,3 @@ def completed_task_notification_by_API(task_id):
         print("Slack message failed:", response.json())
 
     return Response(status=204)
-
-# @bp_child.post("")
-# def tasks_to_goal(goal_id,list_id):
-#     goal = validate_model(Goal, goal_id)
-    
-#     task_ids = []
-#     for task_id in list_id:
-#         task = validate_model(Task, task_id)
-#         task.goal_id = goal.goal_id
-#         task_ids.append(task.task_id)
-
-#     db.session.commit()
-
-#     return {
-#         "id": goal.goal_id,
-#         "task_ids": task_ids
-#     }, 200
-
