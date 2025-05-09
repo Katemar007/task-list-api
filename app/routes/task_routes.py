@@ -7,6 +7,9 @@ from datetime import datetime
 from datetime import timezone
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
