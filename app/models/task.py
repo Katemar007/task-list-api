@@ -36,6 +36,6 @@ class Task(db.Model):
             task_as_dict["completed_at"] = self.completed_at
         
         if self.goal:
-            task_as_dict["goal"] = self.goal.title
+            task_as_dict["goal_id"] = self.goal.id
 
         return task_as_dict

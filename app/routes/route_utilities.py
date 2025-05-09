@@ -29,3 +29,14 @@ def create_model(cls, model_data):
     db.session.commit()
 
     return new_model.to_dict(), 201
+
+def task_to_dict(Task, data):
+    {
+            "id": data.id,
+            "title": data.title,
+            "description": data.description,
+            "is_complete": bool(data.completed_at),
+            "goal": data.goal_id
+    }
+
+    return task_to_dict

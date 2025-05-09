@@ -27,14 +27,9 @@ def get_all_goals():
     if title_param:
         query = query.where(Goal.title.ilike(f"%{title_param}%"))
 
-    # sort_param = request.args.get("sort")
-    # if sort_param == "asc":
-    #     query = query.order_by(Task.title.asc())
-    # elif sort_param == "desc":
-    #     query = query.order_by(Task.title.desc())
-
     query = query.order_by(Goal.id)
-    goals = db.session.scalars(query)
+    result = db.session.execute(query)
+    goals = result.scalars().all()
 
     goals_response = []
     for goal in goals:
@@ -87,3 +82,18 @@ def tasks_to_goal(goal_id):
         "id": goal.id,
         "task_ids": task_list
     }
+
+@bp.get("/<goal_id>/tasks")
+def tasks_for_specific_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    tasks = goal.tasks
+    goal_dict = goal.to_dict()
+    goal_dict["tasks"] = [task.to_dict() for task in tasks]
+    
+    return goal_dict, 200
+
+    # goal = cls(title=goal_data["title"])
+
+    # # Optionally set tasks if they exist
+    # if "tasks" in goal_data:
+    #     goal.tasks = [Task.query.get(task_id) for task_id in goal_data["tasks"]]
