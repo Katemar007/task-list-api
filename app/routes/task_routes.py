@@ -81,9 +81,27 @@ def delete_one_task(task_id):
 def completed_task(task_id):
     task = validate_model(Task, task_id)
     task.completed_at = datetime.now(timezone.utc)
+    task_title = task.title
+    send_request_to_slackbot(task_title)
 
     db.session.commit()
+
     return Response(status=204, mimetype="application/json")
+
+def send_request_to_slackbot(data):
+    bot_path = os.environ.get("SLACK_BOT_PATH")
+    bot_token = os.environ.get("SLACK_BOT_TOKEN")
+    channel_id = os.environ.get("SLACK_CHANNEL_ID")
+    message = "Restoration attempt #3 {data}"
+
+    token = f"Bearer {bot_token}"
+    headers = {
+        "Content-type": "application/json", 
+        "Authorization": token}
+    request_body = {
+        "channel": channel_id,
+        "text": message
+        }
 
 # Wave 3
 @bp.patch("/<task_id>/mark_incomplete")
