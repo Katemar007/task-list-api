@@ -70,7 +70,7 @@ def tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     
     request_body = request.get_json()
-    task_list = request_body.get("task_ids", [])
+    task_list = request_body.get("task_ids")
 
     for task_id in task_list:
         task = validate_model(Task, task_id)
