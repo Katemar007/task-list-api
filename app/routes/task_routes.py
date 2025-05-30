@@ -2,14 +2,12 @@ from flask import Blueprint, abort, make_response, request, Response
 from app.models.task import Task
 from app.models.goal import Goal
 from ..db import db
-from .route_utilities import validate_model, create_model
+from .route_utilities import validate_model, create_model, send_message_task_complete_slack
 from datetime import datetime
 from datetime import timezone
 import requests
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -43,9 +41,7 @@ def get_all_tasks():
     query = query.order_by(Task.id)
     tasks = db.session.scalars(query)
 
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_dict())
+    tasks_response = [task.to_dict() for task in tasks]
     
     return tasks_response
 
@@ -107,7 +103,7 @@ def delete_one_task(task_id):
 #         "text": message
 #         }
 
-
+# CORRECTED YELLOW ISSUE #2 (There are two route handlers registered for /tasks/id/mark_incomplete)
 @bp.patch("/<task_id>/mark_incomplete")
 def incomplete_task(task_id):
     task = validate_model(Task, task_id)
@@ -126,40 +122,14 @@ def incomplete_task(task_id):
 #     return Response(status=204, mimetype="application/json")
 
 
-@bp.patch("/<task_id>/mark_incomplete")
-def incompleted_on_incomplete_task(task_id):
-    task = validate_model(Task, task_id)
-    task.completed_at = None
-
-    db.session.commit()
-    return Response(status=204, mimetype="application/json")
-
 
 @bp.patch("/<task_id>/mark_complete")
 def completed_task_notification_by_API(task_id):
     task = validate_model(Task, task_id)
-    task.title = "My Beautiful Task"
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
 
-    # Send Slack message
-    slack_url = "https://slack.com/api/chat.postMessage"
-    slack_token = os.environ.get("SLACK_BOT_TOKEN")
-    slack_channel = os.environ.get("SLACK_CHANNEL_ID")  # Can also be channel ID like "C01ABCXYZ"
+    send_message_task_complete_slack(task.title)
 
-    message = {
-        "channel": slack_channel,
-        "text": f"Someone just completed the task {task.title}"
-    }
-
-    headers = {
-        "Authorization": f"Bearer {slack_token}",
-        "Content-Type": "application/json"
-    }
-
-    response = requests.post(slack_url, json=message, headers=headers)
-
-    if not response.ok:
-        print("Slack message failed:", response.json())
-
-    return Response(status=204)
+    # ADDED mimetype to fix json
+    return Response(status=204, mimetype="application/json")

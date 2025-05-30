@@ -93,8 +93,5 @@ def tasks_to_goal(goal_id):
 @bp.get("/<goal_id>/tasks")
 def tasks_for_specific_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-    tasks = goal.tasks
-    goal_dict = goal.to_dict()
-    goal_dict["tasks"] = [task.to_dict() for task in tasks]
-    
-    return goal_dict, 200
+
+    return goal.goal_with_tasks(), 200

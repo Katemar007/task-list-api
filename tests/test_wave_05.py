@@ -133,7 +133,7 @@ def test_delete_goal(client, one_goal):
 
     response_body = response.get_json()
     assert "message" in response_body
-    assert "Goal with 1 does not exist" in response_body["message"]
+    assert response_body["message"] == "Goal with 1 does not exist"
 
     # raise Exception("Complete test with assertion about response body")
     # *****************************************************************

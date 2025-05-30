@@ -1,5 +1,7 @@
 from flask import abort, make_response
 from ..db import db
+import os
+import requests
 
 def validate_model(cls, model_id):
     try:
@@ -42,3 +44,23 @@ def task_to_dict(Task, data):
     }
 
     return task_to_dict
+
+def send_message_task_complete_slack(task_title):
+    slack_url = os.environ.get("SLACK_BOT_PATH")
+    slack_token = os.environ.get("SLACK_BOT_TOKEN")
+    slack_channel = os.environ.get("SLACK_CHANNEL_ID")  # Can also be channel ID like "C01ABCXYZ"
+
+    message = {
+        "channel": slack_channel,
+        "text": f"Someone just completed the task {task_title}"
+    }
+
+    headers = {
+        "Authorization": f"Bearer {slack_token}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(slack_url, json=message, headers=headers)
+
+    if not response.ok:
+        print("Slack message failed:", response.json())

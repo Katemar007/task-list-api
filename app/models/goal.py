@@ -12,10 +12,20 @@ class Goal(db.Model):
     def from_dict(cls, goal_data):
         goal = cls(title=goal_data["title"])
 
-        if "tasks" in goal_data:
-            goal.tasks = goal_data["tasks"]
         return goal
 
+    def goal_with_tasks(self):
+        task_list = []
+
+        for task in self.tasks:
+            task = task.to_dict()
+            task["goal_id"] = self.id
+            task_list.append(task)
+        
+        goal_with_tasks = self.to_dict()
+        goal_with_tasks["tasks"] = task_list
+
+        return goal_with_tasks
     
     def to_dict(self):
         goal_as_dict = {
