@@ -2,6 +2,8 @@ from flask import abort, make_response
 from ..db import db
 import os
 import requests
+import logging
+
 
 def validate_model(cls, model_id):
     try:
@@ -63,4 +65,5 @@ def send_message_task_complete_slack(task_title):
     response = requests.post(slack_url, json=message, headers=headers)
 
     if not response.ok:
-        print("Slack message failed:", response.json())
+        logger = logging.getLogger(__name__)
+        logger.error(f"Slack message failed: {response.json()}")
