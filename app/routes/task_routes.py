@@ -2,7 +2,7 @@ from flask import Blueprint, abort, make_response, request, Response
 from app.models.task import Task
 from app.models.goal import Goal
 from ..db import db
-from .route_utilities import validate_model, create_model, send_message_task_complete_slack
+from .route_utilities import validate_model, create_model, delete_model, send_message_task_complete_slack
 from datetime import datetime
 from datetime import timezone
 import requests
@@ -67,12 +67,8 @@ def update_one_task(task_id):
 
 @bp.delete("/<task_id>")
 def delete_one_task(task_id):
-    task = validate_model(Task, task_id)
 
-    db.session.delete(task)
-    db.session.commit()
-
-    return Response(status=204, mimetype="application/json")
+    return delete_model(Task, task_id)
     
 # Wave 3
 # @bp.patch("/<task_id>/mark_complete")

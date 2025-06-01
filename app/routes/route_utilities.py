@@ -1,4 +1,4 @@
-from flask import abort, make_response
+from flask import abort, make_response, Response
 from ..db import db
 import os
 import requests
@@ -34,6 +34,15 @@ def create_model(cls, model_data):
     db.session.commit()
 
     return new_model.to_dict(), 201
+
+def delete_model(cls, model_id):
+    model = validate_model(cls, model_id)
+
+    db.session.delete(model)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+    
 
 # Work in progress
 def task_to_dict(Task, data):

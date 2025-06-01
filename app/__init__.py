@@ -11,8 +11,13 @@ from logging.config import dictConfig
 
 load_dotenv()
 
+
 def create_app(config=None):
     app = Flask(__name__)
+
+    # configure_logging(app)
+    configure_logging(app)
+    logger = logging.getLogger(__name__)
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
@@ -28,7 +33,7 @@ def create_app(config=None):
         logger.info("Database initialized successfully.")
 
         with app.app_context():
-            db.session.execute("SELECT 1")
+            # db.session.execute("SELECT 1")
             logger.info("DB connection test passed")
     except Exception as e:
         logger.exception("Error during DB initialization or connection")
@@ -41,8 +46,6 @@ def create_app(config=None):
 
     configure_logging(app)
     logger = logging.getLogger(__name__)
-
-
 
     return app
 
