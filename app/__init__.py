@@ -15,7 +15,7 @@ load_dotenv()
 
 def create_app(config=None):
     app = Flask(__name__)
-    CORS(app) # Enable CORS for all routes
+    # CORS(app) # Enable CORS for all routes
 
     # configure_logging(app)
     configure_logging(app)
